@@ -1,4 +1,6 @@
+using KarKhanaBook.Core;
 using KarKhanaBook.Core.Challan;
+using KarKhanaBook.Core.Common.GetData;
 using KarKhanaBook.Core.Login;
 using KarKhanaBook.Core.Taka;
 using KarKhanaBook.Middleware;
@@ -87,8 +89,8 @@ namespace KarKhanaBook
                          IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(Configuration["JWT:Secret"]))
                      };
                  });
-
-
+            services.AddTransient<Testing>();
+            services.AddTransient<GetTakaSheetFields>();
             services.AddTransient<ChallanPayments>();
             services.AddTransient<ChallanSlips>();
             services.AddTransient<TakaChallans>();

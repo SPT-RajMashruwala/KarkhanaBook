@@ -114,4 +114,19 @@
       <Association Name="User_UserRefreshToken" ed:AssociationGuid="ffdbe569-2966-4979-99f6-4f7c71b8a8a6" Member="UserRefreshTokens" ed:Guid="01c47ac5-8058-4c0d-9382-4e2e8899bab1" ThisKey="UserID" OtherKey="UserID" Type="UserRefreshToken" />
     </Type>
   </Table>
+  <Table Name="dbo.FixedLookup" Member="FixedLookups">
+    <Type Name="FixedLookup" ed:Guid="8e06d21c-04e9-4ee2-84c3-b556c09650c5">
+      <Column Name="NameID" Type="System.Int32" AutoSync="OnInsert" DbType="INT NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Always" Precision="10" ed:ValidateRequired="true" ed:Guid="87ab8ecb-ea2b-4c31-8615-5cfadebc6568" />
+      <Column Name="Name" Type="System.String" DbType="VARCHAR(50)" CanBeNull="true" UpdateCheck="Never" MaxLength="50" ed:ValidateMaxLength="50" ed:ValidateRequired="false" ed:Guid="53c8b211-6bb0-42e4-b907-6aee149dd32c" />
+      <Association Name="FixedLookup_Lookup" ed:AssociationGuid="5ad7b280-d8ef-4be0-905d-5229eee11f2e" Member="Lookups" ed:Guid="989c6022-5a38-483c-b045-18c1d563963f" ThisKey="NameID" OtherKey="NameID" Type="Lookup" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Lookup" Member="Lookups">
+    <Type Name="Lookup" ed:Guid="c942fc9a-2d98-4420-a196-26776533eeee">
+      <Column Name="ValueID" Type="System.Int32" AutoSync="OnInsert" DbType="INT NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Always" Precision="10" ed:ValidateRequired="true" ed:Guid="fcc248af-efdf-49ff-a9e7-7889f44c7dab" />
+      <Column Name="NameID" Type="System.Int32" DbType="INT" CanBeNull="true" UpdateCheck="Never" Precision="10" ed:ValidateRequired="false" ed:Guid="f87a3f2f-329e-49c7-91ae-b198b816be4e" />
+      <Column Name="Value" Type="System.String" DbType="VARCHAR(100)" CanBeNull="true" UpdateCheck="Never" MaxLength="100" ed:ValidateMaxLength="100" ed:ValidateRequired="false" ed:Guid="b8e84158-609b-41b1-ae11-8a83685c6f41" />
+      <Association Name="FixedLookup_Lookup" ed:AssociationGuid="5ad7b280-d8ef-4be0-905d-5229eee11f2e" Member="FixedLookup" ed:Guid="b8c38a90-d4b8-4795-aa72-52bb9a1c7d08" ThisKey="NameID" OtherKey="NameID" Type="FixedLookup" DeleteRule="NO ACTION" IsForeignKey="true" />
+    </Type>
+  </Table>
 </Database>

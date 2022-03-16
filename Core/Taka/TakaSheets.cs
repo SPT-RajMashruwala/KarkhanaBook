@@ -1,38 +1,200 @@
 ﻿using KarKhanaBook.Model.Common;
 using KarkhanaBookContext;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using static KarKhanaBook.Model.Common.Result;
 
 namespace KarKhanaBook.Core.Taka
-{
+{ 
     public class TakaSheets
     {
+        private readonly IConfiguration _configuration;
+        public TakaSheets(IConfiguration configuration) 
+        {
+            _configuration = configuration;
+        }
+        public TakaSheets() { }
+      
         Model.Taka.TakaSheet takasheets = new Model.Taka.TakaSheet()
         {
             takas = new List<Model.Taka.Taka>()
         };
 
-        public Result FilterSorting(int ID)
+        public Result FilterSorting(DataTable table)
         {
+            
+
             using (KarkhanaBookDataContext context = new KarkhanaBookDataContext())
             {
-                var qs = (from obj in context.TakaSheets
-                          orderby obj.TakaID ascending
-                          select obj).ToList();
+                
+
+                List<Model.Search.SearchTakaSheet> takaSheetx = new List<Model.Search.SearchTakaSheet>();
+                for (int i = 0; i < table.Rows.Count; i++)
+                {
+                    DataRow dr = table.Rows[i];
+
+
+                    takaSheetx.Add(new Model.Search.SearchTakaSheet()
+                    {
+                        TakaSheetIndex = Int16.Parse(dr["TakaSheetIndex"].ToString()),
+                        SloatNumber = Int16.Parse(dr["SlotNumber"].ToString()),
+                        Date = Convert.ToDateTime(dr["Date"].ToString()),
+                        TakaID = Int16.Parse(dr["TakaID"].ToString()),
+                        MachineNumber = Int16.Parse(dr["MachineNumber"].ToString()),
+                        Meter = float.Parse(dr["Meter"].ToString()),
+                        Weight = float.Parse(dr["Weight"].ToString()),
+
+                    });
+                }
+
                 return new Result()
                 {
                     Message = "TakaSheet Added Successfully",
                     Status = ((ResultStatus)(Enum.Parse(typeof(ResultStatus), ResultStatus.success.ToString()
-                    , true))).ToString(),
+                        , true))).ToString(),
                     StatusCode = (int)HttpStatusCode.OK,
-                    Data = qs,
+                    Data = takaSheetx,
                 };
+            }
+            }
+  
+                           
+        //1: Ascending
+        //2: Descending
+        //3: Sorting
+    
+
+        public StringBuilder Sort(string text, int ID,StringBuilder sqlcommand,dynamic Data)
+        {
+
+
+            using (KarkhanaBookDataContext context = new KarkhanaBookDataContext())
+            {
+
+               
+                 if (ID == 1)
+                {
+                    if (sqlcommand.ToString().ToLower() == " select * from dbo.takasheet ")
+                    {
+                        sqlcommand.Append($"order by dbo.TakaSheet.{text} ASC");
+                    }
+                    else
+                    {
+                        sqlcommand.Append($",dbo.TakaSheet.{text} ASC");
+                    }
+
+                }
+                else if (ID == 2)
+                {
+                    if (sqlcommand.ToString().ToLower() == " select * from dbo.takasheet ")
+                    {
+                        sqlcommand.Append($"order by dbo.TakaSheet.{text} DESC");
+                    }
+                    else
+                    {
+                        sqlcommand.Append($",dbo.TakaSheet.{text} DESC");
+                    }
+
+                }
+                
+                return sqlcommand;
+            }
+        }
+        public List<TakaSheet> Sorting(string text,int ID,List<TakaSheet> x) 
+        {
+            
+
+            using (KarkhanaBookDataContext context = new KarkhanaBookDataContext())
+            {
+                var qs= (from obj in x
+                        select obj).ToList();
+                TakaSheet takaSheet = new TakaSheet();
+
+                if (text.ToLower() == "takaid" && ID == 1)
+                {
+                     qs = (from obj in qs
+                              orderby obj.TakaID ascending,obj.MachineNumber ascending,obj.SlotNumber descending
+                              
+                             
+                              
+                              
+                              select obj).ToList();
+                  
+                }
+                else if (text.ToLower() == "takaid" && ID == 2)
+                {
+                     qs = (from obj in qs
+                              orderby obj.TakaID descending
+                              select obj).ToList();
+
+                }
+                else if (text.ToLower() == "machinenumber" && ID == 1)
+                {
+                    qs = (from obj in qs
+                          orderby obj.MachineNumber ascending
+                          select obj).ToList();
+
+                }
+                else if (text.ToLower() == "machinenumber" && ID == 2)
+                {
+                    qs = (from obj in qs
+                          orderby obj.MachineNumber descending
+                          select obj).ToList();
+
+                }
+                else if (text.ToLower() == "slotnumber" && ID == 1)
+                {
+                    qs = (from obj in qs
+                          orderby obj.SlotNumber ascending
+                          select obj).ToList();
+
+                }
+                else if (text.ToLower() == "slotnumber" && ID == 2)
+                {
+                    qs = (from obj in qs
+                          orderby obj.SlotNumber descending
+                          select obj).ToList();
+
+                }
+                else if (text.ToLower() == "meter" && ID == 1)
+                {
+                    qs = (from obj in qs
+                          orderby obj.Meter ascending
+                          select obj).ToList();
+
+                }
+                else if (text.ToLower() == "meter" && ID == 2)
+                {
+                    qs = (from obj in qs
+                          orderby obj.Meter descending
+                          select obj).ToList();
+
+                }
+                else if (text.ToLower() == "weight" && ID == 1)
+                {
+                    qs = (from obj in qs
+                          orderby obj.Weight ascending
+                          select obj).ToList();
+
+                }
+                else if (text.ToLower() == "weight" && ID == 2)
+                {
+                    qs = (from obj in qs
+                          orderby obj.Weight descending
+                          select obj).ToList();
+
+                }
+
+                return qs;
+
             }
         }
         public Result Search(DataTable table)

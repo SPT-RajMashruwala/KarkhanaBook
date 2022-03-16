@@ -1,8 +1,10 @@
 ﻿using KarKhanaBook.Core.Taka;
+using KarkhanaBookContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Text;
 
 namespace KarKhanaBook.Controllers.Taka
 {
@@ -13,7 +15,7 @@ namespace KarKhanaBook.Controllers.Taka
         string query;
         private readonly IConfiguration _configuration;
 
-        public TakaSheetController(IConfiguration configuration )
+        public TakaSheetController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -131,11 +133,12 @@ namespace KarKhanaBook.Controllers.Taka
                             
                            ";
             }
-            else 
+            else
             {
                 throw new System.ArgumentException("please enter valid field!!");
             }
-
+           /* StringBuilder sqlcommand = new StringBuilder("select * from dbo.TakaSheet");
+            sqlcommand.Append("where  dbo.TakaSheet.SlotNumber LIKE 1");*/
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("EmployeeAppCon");
             SqlDataReader myReader;
@@ -160,12 +163,36 @@ namespace KarKhanaBook.Controllers.Taka
             return Ok(new TakaSheets().View());
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("TakaSheet/Filter")]
-        public IActionResult Filter()
+        
+        public IActionResult Filter(Model.Common.nullstring value)
         {
-            return Ok(new TakaSheets().Filter());
+            StringBuilder sqlcommand = new StringBuilder(" select * from dbo.TakaSheet ");
+            TakaSheet takaSheet = new TakaSheet();
+       
+            foreach (var item in value.listnullstrings)
+            {
+                sqlcommand = new TakaSheets().Sort(item.Text, item.ID, sqlcommand,item.Data);
+            }
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("EmployeeAppCon");
+            SqlDataReader myReader;
+            using (SqlConnection myCon = new SqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (SqlCommand myCommand = new SqlCommand(sqlcommand.ToString(), myCon))
+                {
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+                    myReader.Close();
+                    myCon.Close();
+                }
+            }
+
+            return Ok(new TakaSheets().FilterSorting(table));
         }
+
 
         [HttpGet]
         [Route("TakaSheet/ViewById/{ID}")]
